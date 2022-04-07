@@ -3,18 +3,23 @@
 An optional type for golang with generics
 
 ```golang
-
-v := optional.New(123)
+var v optional.Type[int] = optional.New(123)
 if unwrapped, ok := v.Value(); ok {
-	print(unwrapped == 123)
+    unwrapped // 123
 }
 
-print(v.ForceValue() == 123)
+v.IsNil()      // false
+v.ForceValue() // 123
 
 v2 := optional.Nil[int]()
-print(v2.IsNil() == true)
+v2.IsNil() // true
 
+optional.Map(v, func(t int) string {
+    return fmt.Sprintf("hello %d", t)
+}) // Type[string]
 
+v3 := optional.New(optional.New(123))
+optional.Compact(v3) // Type[int]
 ```
 
 # License

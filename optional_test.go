@@ -28,7 +28,7 @@ func TestStruct(t *testing.T) {
 	type S struct {
 		A int
 	}
-	var v Optional[S] = New[S](S{A: 123})
+	var v Type[S] = New[S](S{A: 123})
 	assert(t, !v.IsNil(), "IsNil failed")
 	assert(t, v.ForceValue().A == 123, "ForceValue failed")
 
@@ -98,27 +98,27 @@ func TestPointer(t *testing.T) {
 }
 
 func TestNestedOptional(t *testing.T) {
-	var v Optional[Optional[int]] = New(New(123))
+	var v Type[Type[int]] = New(New(123))
 	assert(t, !v.IsNil(), "IsNil failed")
 	if w, ok := v.Value(); ok {
 		assert(t, !w.IsNil(), "IsNil failed")
 		assert(t, w.ForceValue() == 123, "ForceValue failed")
 	}
 
-	var v2 Optional[Optional[int]] = Nil[Optional[int]]()
+	var v2 Type[Type[int]] = Nil[Type[int]]()
 	assert(t, v2.IsNil(), "IsNil failed")
 
-	var v3 Optional[Optional[int]] = New(Nil[int]())
+	var v3 Type[Type[int]] = New(Nil[int]())
 	assert(t, !v3.IsNil(), "IsNil failed")
 }
 
 func TestCompact(t *testing.T) {
-	var v Optional[Optional[int]] = New(New(123))
+	var v Type[Type[int]] = New(New(123))
 	v2 := Compact(v)
 	assert(t, !v2.IsNil(), "IsNil failed")
 	assert(t, v2.ForceValue() == 123, "ForceValue failed")
 
-	v = Nil[Optional[int]]()
+	v = Nil[Type[int]]()
 	v2 = Compact(v)
 	assert(t, v2.IsNil(), "IsNil failed")
 
@@ -128,6 +128,7 @@ func TestCompact(t *testing.T) {
 }
 
 func TestMap(t *testing.T) {
+
 	v := New[int](1)
 	v2 := Map(v, func(t int) string {
 		return "123"

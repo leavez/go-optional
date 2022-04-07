@@ -1,20 +1,20 @@
 package optional
 
-type Optional[T any] struct {
+type Type[T any] struct {
 	wrapped interface{}
 }
 
-func (s Optional[T]) IsNil() bool {
+func (s Type[T]) IsNil() bool {
 	return s.wrapped == nil
 }
 
 // ForceValue returns the wrapped content if not nil, or it will panic
-func (s Optional[T]) ForceValue() T {
+func (s Type[T]) ForceValue() T {
 	return s.wrapped.(T)
 }
 
 // Value is a golang style unwrapping method
-func (s Optional[T]) Value() (v T, ok bool) {
+func (s Type[T]) Value() (v T, ok bool) {
 	if s.IsNil() {
 		ok = false
 	} else {
@@ -24,8 +24,8 @@ func (s Optional[T]) Value() (v T, ok bool) {
 	return
 }
 
-// ValueOrDefault return d if IsNil() is true
-func (s Optional[T]) ValueOrDefault(d T) T {
+// ValueOrDefault return d if IsNil
+func (s Type[T]) ValueOrDefault(d T) T {
 	if w, ok := s.Value(); ok {
 		return w
 	} else {
@@ -33,7 +33,8 @@ func (s Optional[T]) ValueOrDefault(d T) T {
 	}
 }
 
-func (s Optional[T]) ValueOrLazyDefault(f func() T) T {
+// ValueOrLazyDefault return f() if IsNil
+func (s Type[T]) ValueOrLazyDefault(f func() T) T {
 	if w, ok := s.Value(); ok {
 		return w
 	} else {
@@ -43,15 +44,15 @@ func (s Optional[T]) ValueOrLazyDefault(f func() T) T {
 
 // --- initializer ---
 
-func New[T any](wrapped T) Optional[T] {
-	return Optional[T]{wrapped: wrapped}
+func New[T any](wrapped T) Type[T] {
+	return Type[T]{wrapped: wrapped}
 }
 
-func Nil[T any]() Optional[T] {
-	return Optional[T]{}
+func Nil[T any]() Type[T] {
+	return Type[T]{}
 }
 
-func Compact[T any](wrapped Optional[Optional[T]]) Optional[T] {
+func Compact[T any](wrapped Type[Type[T]]) Type[T] {
 	if w, ok := wrapped.Value(); ok {
 		return w
 	} else {
@@ -59,7 +60,7 @@ func Compact[T any](wrapped Optional[Optional[T]]) Optional[T] {
 	}
 }
 
-func Map[T, U any](v Optional[T], f func(T) U) Optional[U] {
+func Map[T, U any](v Type[T], f func(T) U) Type[U] {
 	if w, ok := v.Value(); ok {
 		return New(f(w))
 	} else {
@@ -69,7 +70,7 @@ func Map[T, U any](v Optional[T], f func(T) U) Optional[U] {
 
 // ---
 
-func FromPtr[T any](wrapped *T) Optional[T] {
+func FromPtr[T any](wrapped *T) Type[T] {
 	if wrapped == nil {
 		return Nil[T]()
 	} else {
