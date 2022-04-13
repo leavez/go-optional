@@ -16,7 +16,10 @@ v.ForceValue() // 123
 ## Methods
 
 ### initializer
-- `optional.New(XX)`
+- `optional.New(XX)` 
+
+If XX is nil, it returns Nil
+
 - `optional.Nil()`
 - (`optional.FromPtr(XXX)` returns optional.Nil() if pointer is nil) 
 
@@ -53,7 +56,12 @@ optional.Compact(v) // optional.Type[int]
 ```
 
 ### serialization
-- json.Marshal and json.Umarshal
+
+json Marshal and Umarshal supported. 
+
+If Nil, the encoded json data is `null`.
+
+
 
 
 # License
