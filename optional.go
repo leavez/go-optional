@@ -1,5 +1,10 @@
 package optional
 
+import (
+	"encoding/json"
+	"errors"
+)
+
 type Type[T any] struct {
 	wrapped interface{}
 }
@@ -76,4 +81,27 @@ func FromPtr[T any](wrapped *T) Type[T] {
 	} else {
 		return New[T](*wrapped)
 	}
+}
+
+// -- Marshaler and Unmarshaler ---
+
+func (s Type[T]) MarshalJSON() ([]byte, error) {
+	if w, ok := s.Value(); ok {
+		return json.Marshal(w)
+	} else {
+		return json.Marshal(nil)
+	}
+}
+
+func (s *Type[T]) UnmarshalJSON(data []byte) error {
+	if s == nil {
+		return errors.New("optional.Type: UnmarshalJSON on nil pointer")
+	}
+	var w *T
+	err := json.Unmarshal(data, &w)
+	if err != nil {
+		return err
+	}
+	*s = FromPtr(w)
+	return nil
 }

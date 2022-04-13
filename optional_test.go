@@ -1,6 +1,7 @@
 package optional
 
 import (
+	"encoding/json"
 	"log"
 	"testing"
 )
@@ -144,4 +145,29 @@ func TestValueOrDefault(t *testing.T) {
 	v2 := Nil[int]()
 	assert(t, v2.ValueOrDefault(10) == 10, "ValueOrDefault failed")
 	assert(t, v2.ValueOrLazyDefault(func() int { return 100 }) == 100, "ValueOrLazyDefault failed")
+}
+
+func TestEncodeAndDecode(t *testing.T) {
+	var v = New(New(123))
+	data, err := json.Marshal(v)
+	assert(t, err == nil, "")
+	assert(t, string(data) == "123", "")
+
+	var v2 Type[Type[int]]
+	err = json.Unmarshal(data, &v2)
+	assert(t, err == nil, "")
+	assert(t, !v2.IsNil(), "")
+	if w, ok := Compact(v2).Value(); ok {
+		assert(t, w == 123, "")
+	}
+
+	// empty
+	v3 := Nil[int]()
+	data, err = json.Marshal(v3)
+	assert(t, err == nil, "")
+	assert(t, string(data) == "null", "")
+	var v4 Type[int]
+	err = json.Unmarshal(data, &v4)
+	assert(t, err == nil, "")
+	assert(t, v4.IsNil(), "")
 }
