@@ -6,6 +6,12 @@ import (
 )
 
 type Type[T any] struct {
+	/** Why we use an interface{} type here? Why not a *T?
+
+	Both *T and interface{} type cloud represent a nil value. But if the real
+	content of wrapped is a nil value of an interface type, we want optional.Type to
+	be Nil. `*T` is hard to implement this behavior.
+	*/
 	wrapped interface{}
 }
 
@@ -49,10 +55,13 @@ func (s Type[T]) ValueOrLazyDefault(f func() T) T {
 
 // --- initializer ---
 
+// New returns an optional.Type. It doesn't always return a non-nil value. If
+// wrapped is a nil value of interface type, it will return Nil
 func New[T any](wrapped T) Type[T] {
 	return Type[T]{wrapped: wrapped}
 }
 
+// Nil return a Nil optional.Type, whose IsNil() is true
 func Nil[T any]() Type[T] {
 	return Type[T]{}
 }
